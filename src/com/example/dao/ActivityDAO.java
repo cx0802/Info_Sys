@@ -9,9 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
-package com.example.dao;
-
 import com.example.model.Activity;
 import com.example.model.Weather;
 import java.sql.*;
@@ -110,6 +107,8 @@ public class ActivityDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return false;
     }
@@ -177,7 +176,7 @@ public class ActivityDAO {
     public float getCaloriesPerMinute(int typeId) throws Exception {
         float caloriesPerMinute = 0;
         try (Connection con = DBUtil.getConnection()) {
-            String query = "SELECT calories_per_minute FROM ActivityCalories WHERE type_id = ?";
+            String query = "SELECT calories_per_minute FROM ActivityCalories WHERE activity_type = ?";
             try (PreparedStatement pst = con.prepareStatement(query)) {
                 pst.setInt(1, typeId);
                 try (ResultSet rs = pst.executeQuery()) {
@@ -204,6 +203,8 @@ public class ActivityDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return activityTypes;
     }
