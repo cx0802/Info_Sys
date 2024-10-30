@@ -9,26 +9,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import com.example.model.Activity;
-import com.example.model.Weather;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ActivityDAO {
-
-    // 获取所有活动
+    // Method to get all activities from TABLE Activities
     public List<Activity> getAllActivities() throws Exception {
         List<Activity> activities = new ArrayList<>();
         try (Connection con = DBUtil.getConnection()) {
-            String query = "SELECT activity_id, user_id, type_id, date, start_time, duration_minutes FROM Activities";
+            String query = "SELECT activity_id, user_id, activity_type, date, start_time, duration_minutes FROM Activities";
             try (PreparedStatement pst = con.prepareStatement(query)) {
                 try (ResultSet rs = pst.executeQuery()) {
                     while (rs.next()) {
                         Activity activity = new Activity();
                         activity.setActivityId(rs.getInt("activity_id"));
                         activity.setUserId(rs.getInt("user_id"));
-                        activity.setTypeId(rs.getInt("type_id")); // 使用 typeId
+                        activity.setActivityType(rs.getString("activity_type"));
                         activity.setDate(rs.getDate("date"));
                         activity.setStartTime(rs.getTime("start_time"));
                         activity.setDurationMinutes(rs.getInt("duration_minutes"));
@@ -40,11 +34,11 @@ public class ActivityDAO {
         return activities;
     }
 
-    // 根据活动ID获取单个活动
+    // Method to get one user's activities from TABLE Activities
     public Activity getActivityById(int activityId) throws Exception {
         Activity activity = null;
         try (Connection con = DBUtil.getConnection()) {
-            String query = "SELECT activity_id, user_id, type_id, date, start_time, duration_minutes FROM Activities WHERE activity_id = ?";
+            String query = "SELECT activity_id, user_id, activity_type, date, start_time, duration_minutes FROM Activities WHERE activity_id = ?";
             try (PreparedStatement pst = con.prepareStatement(query)) {
                 pst.setInt(1, activityId);
                 try (ResultSet rs = pst.executeQuery()) {
@@ -52,7 +46,7 @@ public class ActivityDAO {
                         activity = new Activity();
                         activity.setActivityId(rs.getInt("activity_id"));
                         activity.setUserId(rs.getInt("user_id"));
-                        activity.setTypeId(rs.getInt("type_id")); // 使用 typeId
+                        activity.setActivityType(rs.getString("activity_type"));
                         activity.setDate(rs.getDate("date"));
                         activity.setStartTime(rs.getTime("start_time"));
                         activity.setDurationMinutes(rs.getInt("duration_minutes"));
@@ -63,7 +57,7 @@ public class ActivityDAO {
         return activity;
     }
 
-    // 删除活动
+    // Method to get one activity from TABLE Activities
     public void deleteActivity(int activityId) throws Exception {
         try (Connection con = DBUtil.getConnection()) {
             String query = "DELETE FROM Activities WHERE activity_id = ?";
@@ -74,7 +68,7 @@ public class ActivityDAO {
         }
     }
 
-    // 根据用户名获取用户ID
+    // Method to get one user's username by user_id in TABLE Users
     public int getUserIdByUsername(String username) throws Exception {
         int userId = -1;
         try (Connection con = DBUtil.getConnection()) {
@@ -91,37 +85,31 @@ public class ActivityDAO {
         return userId;
     }
 
-    // 插入新活动
-    public boolean addActivity(Activity activity) {
-        String sql = "INSERT INTO activities (user_id, type_id, date, start_time, duration_minutes) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, activity.getUserId());
-            stmt.setInt(2, activity.getTypeId()); // 使用 typeId 代替 activityType
-            stmt.setDate(3, activity.getDate());
-            stmt.setTime(4, activity.getStartTime());
-            stmt.setInt(5, activity.getDurationMinutes());
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    // Method to add one activity to TABLE Activities
+    public void addActivity(Activity activity) throws Exception {
+        try (Connection con = DBUtil.getConnection()) {
+            String query = "INSERT INTO Activities (user_id, activity_type, date, start_time, duration_minutes) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pst = con.prepareStatement(query)) {
+                pst.setInt(1, activity.getUserId());
+                pst.setString(2, activity.getActivityType());
+                pst.setDate(3, activity.getDate());
+                pst.setTime(4, activity.getStartTime());
+                pst.setInt(5, activity.getDurationMinutes());
+                pst.executeUpdate();
+            }
         }
-        return false;
     }
 
-    // 搜索用户活动
-    public List<Activity> searchActivities(String username, Integer typeId, String date) throws Exception {
+    // Method to search one user's activities from TABLE Activities. (User can search by condition)
+    public List<Activity> searchActivities(String username, String activityType, String date) throws Exception {
         List<Activity> activities = new ArrayList<>();
         try (Connection con = DBUtil.getConnection()) {
             StringBuilder query = new StringBuilder(
-                    "SELECT activity_id, user_id, type_id, date, start_time, duration_minutes " +
+                    "SELECT activity_id, user_id, activity_type, date, start_time, duration_minutes " +
                             "FROM Activities WHERE user_id = (SELECT user_id FROM Users WHERE username = ?) ");
-            if (typeId != null) {
-                query.append("AND type_id = ? ");
+            if (activityType != null && !activityType.isEmpty()) {
+                query.append("AND activity_type = ? ");
             }
             if (date != null && !date.isEmpty()) {
                 query.append("AND date = ? ");
@@ -130,8 +118,8 @@ public class ActivityDAO {
             PreparedStatement pst = con.prepareStatement(query.toString());
             pst.setString(1, username);
             int index = 2;
-            if (typeId != null) {
-                pst.setInt(index++, typeId);
+            if (activityType != null && !activityType.isEmpty()) {
+                pst.setString(index++, activityType);
             }
             if (date != null && !date.isEmpty()) {
                 pst.setString(index, date);
@@ -142,7 +130,7 @@ public class ActivityDAO {
                     Activity activity = new Activity();
                     activity.setActivityId(rs.getInt("activity_id"));
                     activity.setUserId(rs.getInt("user_id"));
-                    activity.setTypeId(rs.getInt("type_id")); // 使用 typeId
+                    activity.setActivityType(rs.getString("activity_type"));
                     activity.setDate(rs.getDate("date"));
                     activity.setStartTime(rs.getTime("start_time"));
                     activity.setDurationMinutes(rs.getInt("duration_minutes"));
@@ -153,7 +141,7 @@ public class ActivityDAO {
         return activities;
     }
 
-    // 获取用户在时间段内的总活动时长
+    // Method to get one user's total sport time in a time period
     public int getTotalDuration(String username, String startDate, String endDate) throws Exception {
         int totalDuration = 0;
         try (Connection con = DBUtil.getConnection()) {
@@ -172,13 +160,13 @@ public class ActivityDAO {
         return totalDuration;
     }
 
-    // 获取特定类型运动的每分钟消耗卡路里
-    public float getCaloriesPerMinute(int typeId) throws Exception {
+    // Method to get calories burned per minutes for one type of sport
+    public float getCaloriesPerMinute(String activityType) throws Exception {
         float caloriesPerMinute = 0;
         try (Connection con = DBUtil.getConnection()) {
             String query = "SELECT calories_per_minute FROM ActivityCalories WHERE activity_type = ?";
             try (PreparedStatement pst = con.prepareStatement(query)) {
-                pst.setInt(1, typeId);
+                pst.setString(1, activityType);
                 try (ResultSet rs = pst.executeQuery()) {
                     if (rs.next()) {
                         caloriesPerMinute = rs.getFloat("calories_per_minute");
@@ -189,27 +177,7 @@ public class ActivityDAO {
         return caloriesPerMinute;
     }
 
-    // 获取所有活动类型
-    public List<String> getAllActivityTypes() {
-        List<String> activityTypes = new ArrayList<>();
-        String sql = "SELECT type_name FROM activitytypes"; // 假设活动类型表有 type_name 字段表示类型名称
-        try (Connection conn = DBUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                activityTypes.add(rs.getString("type_name"));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return activityTypes;
-    }
-
-    // 根据日期获取天气状况
+    // Method to get weather condition by data
     public Weather getWeatherByDate(String date) throws Exception {
         Weather weather = null;
         try (Connection con = DBUtil.getConnection()) {
@@ -228,3 +196,4 @@ public class ActivityDAO {
         return weather;
     }
 }
+
