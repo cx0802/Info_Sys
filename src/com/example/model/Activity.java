@@ -1,11 +1,14 @@
 package com.example.model;
 
+import java.sql.Date;
+import java.sql.Time;
+
 public class Activity {
     private int activityId;
     private int userId;
     private String activityType;
-    private java.sql.Date date;
-    private java.sql.Time startTime;
+    private Date date;
+    private Time startTime;
     private int durationMinutes;
 
     // Getters and Setters
@@ -15,10 +18,10 @@ public class Activity {
     public void setUserId(int userId) { this.userId = userId; }
     public String getActivityType() { return activityType; }
     public void setActivityType(String activityType) { this.activityType = activityType; }
-    public java.sql.Date getDate() { return date; }
-    public void setDate(java.sql.Date date) { this.date = date; }
-    public java.sql.Time getStartTime() { return startTime; }
-    public void setStartTime(java.sql.Time startTime) { this.startTime = startTime; }
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
+    public Time getStartTime() { return startTime; }
+    public void setStartTime(Time startTime) { this.startTime = startTime; }
     public int getDurationMinutes() { return durationMinutes; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
 }

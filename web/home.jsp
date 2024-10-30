@@ -69,7 +69,7 @@
 <div class="container">
     <h2>欢迎, ${username}</h2>
     <ul>
-        <li><a href="addActivity.jsp">添加运动活动</a></li>
+        <li><a href="AddActivityServlet">添加运动活动</a></li>
         <li><a href="deleteActivity.jsp">删除运动活动</a></li>
         <li><a href="searchActivity.jsp">搜索运动活动</a></li>
         <li><a href="totalDuration.jsp">计算总运动时间</a></li>

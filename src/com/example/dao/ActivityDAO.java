@@ -1,6 +1,7 @@
 package com.example.dao;
 
 import com.example.model.Activity;
+import com.example.model.ActivityType;
 import com.example.model.Weather;
 import com.example.util.DBUtil;
 
@@ -195,5 +196,24 @@ public class ActivityDAO {
         }
         return weather;
     }
+
+    public List<ActivityType> getActivityTypes() throws Exception {
+        List<ActivityType> activityTypes = new ArrayList<>();
+        try (Connection con = DBUtil.getConnection()) {
+            String query = "SELECT activity_type FROM ActivityCalories";
+            try (PreparedStatement pst = con.prepareStatement(query);
+                 ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    ActivityType type = new ActivityType();
+                    type.setActivityType(rs.getString("activity_type"));
+                    activityTypes.add(type);
+                }
+            }
+            // 调试输出
+            System.out.println("Fetched activity types: " + activityTypes);
+        }
+        return activityTypes;
+    }
+
 }
 

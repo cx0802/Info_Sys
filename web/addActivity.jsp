@@ -59,7 +59,7 @@
         <label for="activityType">运动类型:</label>
         <select name="activityType" id="activityType" required>
             <c:forEach var="type" items="${activityTypes}">
-                <option value="${type}">${type}</option>
+                <option value="${type.activityType}">${type.activityType}</option>
             </c:forEach>
         </select>
         <label for="date">日期:</label>
