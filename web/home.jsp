@@ -75,7 +75,7 @@
         <li><a href="totalDuration.jsp">计算总运动时间</a></li>
         <li><a href="leaderboard.jsp">排行榜</a></li>
         <li><a href="setProfile.jsp">设置个人资料</a></li>
-        <li><a href="editProfile.jsp">编辑个人资料</a></li>
+        <li><a href="EditProfileServlet">编辑个人资料</a></li>
         <li><a href="editAccount.jsp">编辑账户</a></li>
         <li><a href="shareActivity.jsp">分享活动</a></li>
 

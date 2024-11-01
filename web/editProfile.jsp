@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -64,15 +65,19 @@
   <h2>编辑个人资料</h2>
   <form action="EditProfileServlet" method="post">
     <label for="region">地区：</label>
-    <input type="text" id="region" name="region" required>
+    <input type="text" id="region" name="region" value="${userRegion}" required>
+
     <label for="gender">性别：</label>
-    <input type="text" id="gender" name="gender" required>
+    <input type="text" id="gender" name="gender" value="${userGender}" required>
+
     <label for="age">年龄：</label>
-    <input type="number" id="age" name="age" required>
+    <input type="number" id="age" name="age" value="${userAge}" required>
+
     <label for="weight">体重 (KG)：</label>
-    <input type="number" id="weight" step="0.01" name="weight" required>
+    <input type="number" id="weight" step="0.01" name="weight" value="${userWeight}" required>
     <label for="height">身高 (CM)：</label>
-    <input type="number" id="height" step="0.01" name="height" required>
+    <input type="number" id="height" step="0.01" name="height" value="${userHeight}" required>
+
     <input type="submit" value="提交">
   </form>
 </div>

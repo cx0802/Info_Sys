@@ -231,6 +231,9 @@ public class UserDAO {
                 }
             }
 
+
+
+
             // 插入或更新 UserProfile 表中的用户资料信息
             String query = "INSERT INTO UserProfile (user_id, region, gender, age, weight, height) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE region = ?, gender = ?, age = ?, weight = ?, height = ?";
             try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -249,4 +252,46 @@ public class UserDAO {
             }
         }
     }
+    // Method to get user profile by username
+    public User getUserProfileByUsername(String username) throws Exception {
+        User user = null;
+        try (Connection con = DBUtil.getConnection()) {
+            String query = "SELECT region, gender, age, weight, height FROM UserProfile WHERE user_id = (SELECT user_id FROM Users WHERE username = ?)";
+            try (PreparedStatement pst = con.prepareStatement(query)) {
+                pst.setString(1, username);
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        user = new User();
+                        user.setRegion(rs.getString("region"));
+                        user.setGender(rs.getString("gender"));
+                        user.setAge(rs.getInt("age"));
+                        user.setWeight(rs.getDouble("weight"));
+                        user.setHeight(rs.getDouble("height"));
+                    }
+                }
+            }
+        }
+        return user;
+    }
+
+
+    // UserDAO.java
+    public int getUserIdByUsername(String username) throws Exception {
+        int userId = 0;
+        try (Connection con = DBUtil.getConnection()) {
+            String query = "SELECT user_id FROM Users WHERE username = ?";
+            try (PreparedStatement pst = con.prepareStatement(query)) {
+                pst.setString(1, username);
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        userId = rs.getInt("user_id");
+                    }
+                }
+            }
+        }
+        return userId;
+    }
+
+
+
 }
