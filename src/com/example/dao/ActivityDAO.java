@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ActivityDAO {
@@ -213,6 +214,28 @@ public class ActivityDAO {
             System.out.println("Fetched activity types: " + activityTypes);
         }
         return activityTypes;
+    }
+
+    public int getCompletedDurationByType(int userId, String activityType, Date startDate, Date endDate) throws Exception {
+        String sql = "SELECT SUM(duration_minutes) FROM activities " +
+                     "WHERE user_id = ? AND activity_type = ? " +
+                     "AND date >= ? AND date <= ?";
+                 
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            stmt.setString(2, activityType);
+            stmt.setDate(3, (java.sql.Date) startDate);
+            stmt.setDate(4, (java.sql.Date) endDate);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
 }

@@ -73,6 +73,9 @@
         <li><a href="deleteActivity.jsp">删除运动活动</a></li>
         <li><a href="searchActivity.jsp">搜索运动活动</a></li>
         <li><a href="totalDuration.jsp">计算总运动时间</a></li>
+        <li><a href="CreateExercisePlanServlet">创建运动计划</a></li>
+        <li><a href="ViewExercisePlanServlet">查看运动计划</a></li>
+        <li><a href="EditExercisePlanServlet">编辑运动计划</a></li>
         <li><a href="leaderboard.jsp">排行榜</a></li>
         <li><a href="setProfile.jsp">设置个人资料</a></li>
         <li><a href="EditProfileServlet">编辑个人资料</a></li>
