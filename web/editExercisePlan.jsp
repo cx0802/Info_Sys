@@ -126,6 +126,39 @@
 </div>
 
 <script>
+// 获取所有已选择的运动类型
+function getSelectedTypes() {
+    const selects = document.querySelectorAll('select[name="activityType[]"]');
+    return Array.from(selects).map(select => select.value);
+}
+
+// 更新所有选择框的可选项
+function updateActivitySelects() {
+    const selects = document.querySelectorAll('select[name="activityType[]"]');
+    const selectedTypes = getSelectedTypes();
+    
+    selects.forEach((select) => {
+        const currentValue = select.value;
+        select.innerHTML = '';
+        
+        // 获取所有可用的运动类型选项
+        <c:forEach var="type" items="${activityTypes}">
+            // 如果当前选项未被其他选择框选中，或者是当前选择框已选中的值，则添加该选项
+            if (!selectedTypes.includes('${type.activityType}') || currentValue === '${type.activityType}') {
+                const option = document.createElement('option');
+                option.value = '${type.activityType}';
+                option.text = '${type.activityType}';
+                select.add(option);
+            }
+        </c:forEach>
+        
+        // 恢复之前选中的值
+        if (currentValue) {
+            select.value = currentValue;
+        }
+    });
+}
+
 function addExerciseItem() {
     const container = document.getElementById('exerciseItems');
     const newItem = document.createElement('div');
@@ -133,7 +166,7 @@ function addExerciseItem() {
     newItem.innerHTML = `
         <div class="form-group">
             <label>运动类型：</label>
-            <select name="activityType[]" required>
+            <select name="activityType[]" required onchange="updateActivitySelects()">
                 <c:forEach var="type" items="${activityTypes}">
                     <option value="${type.activityType}">${type.activityType}</option>
                 </c:forEach>
@@ -150,14 +183,31 @@ function addExerciseItem() {
         <button type="button" class="remove-exercise" onclick="removeExerciseItem(this)">删除</button>
     `;
     container.appendChild(newItem);
+    
+    // 更新所有选择框的可选项
+    updateActivitySelects();
 }
 
 function removeExerciseItem(button) {
     const exerciseItem = button.closest('.exercise-item');
     if (exerciseItem) {
         exerciseItem.remove();
+        // 当删除一个运动项目后，更新所有选择框的可选项
+        updateActivitySelects();
     }
 }
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 为所有现有的选择框添加 change 事件监听器
+    const selects = document.querySelectorAll('select[name="activityType[]"]');
+    selects.forEach(select => {
+        select.addEventListener('change', updateActivitySelects);
+    });
+    
+    // 初始更新所有选择框
+    updateActivitySelects();
+});
 </script>
 </body>
 </html> 

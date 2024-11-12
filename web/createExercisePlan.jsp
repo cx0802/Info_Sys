@@ -119,14 +119,49 @@
 </div>
 
 <script>
+// 获取所有已选择的运动类型
+function getSelectedTypes() {
+    const selects = document.querySelectorAll('select[name="activityType[]"]');
+    return Array.from(selects).map(select => select.value);
+}
+
+// 更新所有选择框的可选项
+function updateActivitySelects() {
+    const selects = document.querySelectorAll('select[name="activityType[]"]');
+    const selectedTypes = getSelectedTypes();
+    
+    selects.forEach((select, index) => {
+        const currentValue = select.value;
+        select.innerHTML = '';
+        
+        // 获取所有可用的运动类型选项
+        <c:forEach var="type" items="${activityTypes}">
+            // 如果当前选项未被其他选择框选中，或者是当前选择框已选中的值，则添加该选项
+            if (!selectedTypes.includes('${type.activityType}') || currentValue === '${type.activityType}') {
+                const option = document.createElement('option');
+                option.value = '${type.activityType}';
+                option.text = '${type.activityType}';
+                select.add(option);
+            }
+        </c:forEach>
+        
+        // 恢复之前选中的值
+        if (currentValue) {
+            select.value = currentValue;
+        }
+    });
+}
+
 function addExerciseItem() {
     const container = document.getElementById('exerciseItems');
     const newItem = document.createElement('div');
     newItem.className = 'exercise-item';
-    newItem.innerHTML = `
+    
+    // 创建新的选择框
+    const selectHtml = `
         <div class="form-group">
             <label>运动类型：</label>
-            <select name="activityType[]" required>
+            <select name="activityType[]" required onchange="updateActivitySelects()">
                 <c:forEach var="type" items="${activityTypes}">
                     <option value="${type.activityType}">${type.activityType}</option>
                 </c:forEach>
@@ -141,8 +176,19 @@ function addExerciseItem() {
             <input type="number" name="weeklyFrequency[]" required>
         </div>
     `;
+    
+    newItem.innerHTML = selectHtml;
     container.appendChild(newItem);
+    
+    // 更新所有选择框的可选项
+    updateActivitySelects();
 }
+
+// 为第一个选择框添加 change 事件监听器
+document.addEventListener('DOMContentLoaded', function() {
+    const firstSelect = document.querySelector('select[name="activityType[]"]');
+    firstSelect.addEventListener('change', updateActivitySelects);
+});
 </script>
 </body>
 </html> 

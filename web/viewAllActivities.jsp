@@ -57,6 +57,9 @@
 <body>
 <div class="container">
     <h2>查看所有活动</h2>
+    <div class="button-container">
+        <a href="SelectUserForActivityServlet" class="add-button">新增活动</a>
+    </div>
     <table>
         <tr>
             <th>活动 ID</th>

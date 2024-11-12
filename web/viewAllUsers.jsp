@@ -52,11 +52,33 @@
         a:hover {
             text-decoration: underline;
         }
+        .button-container {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        
+        .add-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .add-button:hover {
+            background-color: #1976D2;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>查看所有用户</h2>
+    <div class="button-container">
+        <a href="register.jsp" class="add-button">新增用户</a>
+    </div>
     <table>
         <tr>
             <th>用户 ID</th>

@@ -39,19 +39,32 @@ public class AddActivityServlet extends HttpServlet {
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
         HttpSession session = request.getSession();
+        
+        // 获取选定的用户ID（来自管理员选择）或当前登录用户
+        Integer selectedUserId = (Integer) session.getAttribute("selectedUserId");
         String username = (String) session.getAttribute("username");
-
-        String activityType = request.getParameter("activityType");
-        String dateStr = request.getParameter("date");
-        String startTimeStr = request.getParameter("startTime") + ":00";  // Ensure time format
-        int duration = Integer.parseInt(request.getParameter("duration"));
+        
         try {
             ActivityDAO activityDAO = new ActivityDAO();
-            int userId = activityDAO.getUserIdByUsername(username);
+            int userId;
+            
+            if (selectedUserId != null) {
+                // 管理员添加活动
+                userId = selectedUserId;
+                // 清除session中的selectedUserId
+                session.removeAttribute("selectedUserId");
+            } else {
+                // 普通用户添加活动
+                userId = activityDAO.getUserIdByUsername(username);
+            }
 
             if (userId != -1) {
+                String activityType = request.getParameter("activityType");
+                String dateStr = request.getParameter("date");
+                String startTimeStr = request.getParameter("startTime") + ":00";
+                int duration = Integer.parseInt(request.getParameter("duration"));
+
                 Activity activity = new Activity();
                 activity.setUserId(userId);
                 activity.setActivityType(activityType);
@@ -61,7 +74,12 @@ public class AddActivityServlet extends HttpServlet {
 
                 activityDAO.addActivity(activity);
 
-                response.sendRedirect("home.jsp");
+                // 根据是否是管理员操作决定重定向位置
+                if (selectedUserId != null) {
+                    response.sendRedirect("ViewAllActivitiesServlet");
+                } else {
+                    response.sendRedirect("home.jsp");
+                }
             } else {
                 response.sendRedirect("error.html");
             }
