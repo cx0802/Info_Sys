@@ -80,7 +80,8 @@
         <li><a href="setProfile.jsp">设置个人资料</a></li>
         <li><a href="EditProfileServlet">编辑个人资料</a></li>
         <li><a href="editAccount.jsp">编辑账户</a></li>
-        <li><a href="shareActivity.jsp">分享活动</a></li>
+        <li><a href="ShareActivityServlet">分享活动</a></li>
+        <a href="SharedActivitiesServlet" class="menu-item">查看运动分享墙</a>
 
     </ul>
     <a href="LogoutServlet" class="logout">登出</a>

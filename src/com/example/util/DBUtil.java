@@ -8,7 +8,7 @@ import java.sql.DriverManager;
  * @author Yuxuan Zhang
  */
 public class DBUtil {
-    private static final String URL = "jdbc:mysql://localhost:3306/SportActivityDB";
+    private static final String URL = "jdbc:mysql://localhost:3306/SportactivityDB";
     private static final String USER = "root";
     private static final String PASSWORD = "@Chenxi040802";
 

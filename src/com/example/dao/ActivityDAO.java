@@ -238,5 +238,39 @@ public class ActivityDAO {
         return 0;
     }
 
+    public List<Activity> getActivitiesByUserId(int userId) throws Exception {
+        List<Activity> activities = new ArrayList<>();
+        String sql = "SELECT a.*, w.temperature, w.weather_condition " +
+                     "FROM activities a " +
+                     "LEFT JOIN weather w ON DATE(a.date) = w.date " +
+                     "WHERE a.user_id = ? " +
+                     "ORDER BY a.date DESC, a.start_time DESC";
+        
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Activity activity = new Activity();
+                activity.setActivityId(rs.getInt("activity_id"));
+                activity.setUserId(rs.getInt("user_id"));
+                activity.setActivityType(rs.getString("activity_type"));
+                activity.setDate(rs.getDate("date"));
+                activity.setStartTime(rs.getTime("start_time"));
+                activity.setDurationMinutes(rs.getInt("duration_minutes"));
+                
+                // 设置天气相关信息
+                activity.setTemperature(rs.getFloat("temperature"));
+                activity.setWeatherCondition(rs.getString("weather_condition"));
+                
+                activities.add(activity);
+            }
+        }
+        
+        return activities;
+    }
+
 }
 

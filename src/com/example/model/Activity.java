@@ -10,6 +10,9 @@ public class Activity {
     private Date date;
     private Time startTime;
     private int durationMinutes;
+    private float temperature;
+    private String weatherCondition;
+    private float totalCaloriesBurned;
 
     // Getters and Setters
     public int getActivityId() { return activityId; }
@@ -24,4 +27,10 @@ public class Activity {
     public void setStartTime(Time startTime) { this.startTime = startTime; }
     public int getDurationMinutes() { return durationMinutes; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+    public float getTemperature() { return temperature; }
+    public void setTemperature(float temperature) { this.temperature = temperature; }
+    public String getWeatherCondition() { return weatherCondition; }
+    public void setWeatherCondition(String weatherCondition) { this.weatherCondition = weatherCondition; }
+    public float getTotalCaloriesBurned() { return totalCaloriesBurned; }
+    public void setTotalCaloriesBurned(float totalCaloriesBurned) { this.totalCaloriesBurned = totalCaloriesBurned; }
 }

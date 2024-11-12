@@ -1,51 +1,87 @@
 package com.example.servlet;
 
 import com.example.dao.ActivityDAO;
+import com.example.dao.SharedActivityDAO;
 import com.example.model.Activity;
-import com.example.model.Weather;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "ShareActivityServlet", value = "/ShareActivityServlet")
 public class ShareActivityServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String activityIdStr = request.getParameter("activityId");
-        int activityId = Integer.parseInt(activityIdStr);
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String username = (String) session.getAttribute("username");
+        
+        if (username == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
         try {
             ActivityDAO activityDAO = new ActivityDAO();
-            Activity activity = activityDAO.getActivityById(activityId);
-
-            if (activity != null) {
-                String activityType = activity.getActivityType();
-                int duration = activity.getDurationMinutes();
-                String date = activity.getDate().toString();
-                String startTime = activity.getStartTime().toString();
-
-                Weather weather = activityDAO.getWeatherByDate(date);
-                float caloriesPerMinute = activityDAO.getCaloriesPerMinute(activityType);
-                float totalCaloriesBurned = caloriesPerMinute * duration;
-
-                request.setAttribute("activityType", activityType);
-                request.setAttribute("duration", duration);
-                request.setAttribute("date", date);
-                request.setAttribute("startTime", startTime);
-                request.setAttribute("temperature", weather != null ? weather.getTemperature() : 0);
-                request.setAttribute("weatherCondition", weather != null ? weather.getWeatherCondition() : "Unknown");
-                request.setAttribute("totalCaloriesBurned", totalCaloriesBurned);
-
-                request.getRequestDispatcher("shareActivityResult.jsp").forward(request, response);
-            } else {
-                response.sendRedirect("error.html");
-            }
+            int userId = activityDAO.getUserIdByUsername(username);
+            List<Activity> activities = activityDAO.getActivitiesByUserId(userId);
+            
+            request.setAttribute("activities", activities);
+            request.getRequestDispatcher("shareActivity.jsp").forward(request, response);
+            
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.html");
+            response.sendRedirect("error.jsp");
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String username = (String) session.getAttribute("username");
+        
+        if (username == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        try {
+            int activityId = Integer.parseInt(request.getParameter("activityId"));
+            String shareText = request.getParameter("shareText");
+            
+            ActivityDAO activityDAO = new ActivityDAO();
+            int userId = activityDAO.getUserIdByUsername(username);
+            
+            Activity activity = activityDAO.getActivityById(activityId);
+            if (activity == null || activity.getUserId() != userId) {
+                response.sendRedirect("error.jsp");
+                return;
+            }
+            
+            SharedActivityDAO sharedActivityDAO = new SharedActivityDAO();
+            sharedActivityDAO.shareActivity(activityId, userId, shareText);
+            
+            // 设置活动相关信息
+            request.setAttribute("activityType", activity.getActivityType());
+            request.setAttribute("duration", activity.getDurationMinutes());
+            request.setAttribute("date", activity.getDate());
+            request.setAttribute("startTime", activity.getStartTime());
+            request.setAttribute("temperature", activity.getTemperature());
+            request.setAttribute("weatherCondition", activity.getWeatherCondition());
+            request.setAttribute("totalCaloriesBurned", activity.getTotalCaloriesBurned());
+            
+            request.getRequestDispatcher("shareActivityResult.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("error.jsp");
         }
     }
 }
